@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>कोचिंग क्लास मॅनेजर</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700&family=Yatra+One&display=swap">
+<style>
+:root{--bg:#EDF2EF;--surface:#fff;--surface2:#E3EBE7;--ink:#14211D;--muted:#566660;--line:#C9D5CF;--accent:#1B6B57;--accent-ink:#fff;--board:#16312A;--wood:#8B5E34;--chalk:#F4F1E6;--chalk-y:#F3D56B;--good:#1E7D4F;--good-bg:#DCF1E4;--warn:#7F5300;--warn-bg:#FAEBC2;--bad:#B3321F;--bad-bg:#F9DAD4;--fd:'Mukta','Noto Sans Devanagari',system-ui,sans-serif;--fb:'Mukta','Noto Sans Devanagari',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0C1411;--surface:#14201C;--surface2:#1C2C27;--ink:#E6EEEA;--muted:#97A9A2;--line:#2B3D37;--accent:#4DB99A;--accent-ink:#06130F;--board:#0F221C;--wood:#6E4A29;--good:#5CCB92;--good-bg:#12301F;--warn:#E5B94A;--warn-bg:#33270A;--bad:#F0806E;--bad-bg:#3A1914;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0C1411;--surface:#14201C;--surface2:#1C2C27;--ink:#E6EEEA;--muted:#97A9A2;--line:#2B3D37;--accent:#4DB99A;--accent-ink:#06130F;--board:#0F221C;--wood:#6E4A29;--good:#5CCB92;--good-bg:#12301F;--warn:#E5B94A;--warn-bg:#33270A;--bad:#F0806E;--bad-bg:#3A1914;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;font-family:var(--fb);font-size:16px;line-height:1.5;background:var(--bg);color:var(--ink);padding-block:12px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.app{max-width:760px;margin:0 auto}h1,h2,h3,h4,p{margin:0}h2{font-family:var(--fd);font-weight:400;font-size:20px}h3{font-size:17px}
+button,input,select,textarea{font:inherit;color:inherit}:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.board{background:var(--board);color:var(--chalk);border:6px solid var(--wood);border-radius:4px;padding:18px 16px 22px;box-shadow:inset 0 0 40px rgba(0,0,0,.4);display:grid;gap:14px}
+.board :focus-visible{outline-color:var(--chalk-y)}.bTop{display:flex;gap:14px;align-items:center}
+.logo{flex:0 0 auto;width:54px;height:54px;border:2px solid var(--chalk-y);color:var(--chalk-y);display:grid;place-items:center;font-family:var(--fd);font-size:28px}
+.board h1{font-family:var(--fd);font-weight:400;font-size:clamp(26px,7.2vw,40px);line-height:1.2;overflow-wrap:anywhere}.tag{opacity:.85}
+.row,.bBtns{display:flex;gap:8px;flex-wrap:wrap}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;min-height:42px;padding:0 15px;border:1px solid var(--line);background:var(--surface);border-radius:6px;font-weight:700;font-size:15px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+#panel{display:grid;gap:14px;margin-top:6px}.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;display:grid;gap:12px;min-width:0}
+.sub{font-size:14px;color:var(--muted)}.sel{user-select:all;font-weight:600}
+.form{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end}.wide{grid-column:1/-1}
+.lbl{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:3px}
+input,select,textarea{width:100%;min-height:44px;padding:8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:6px}textarea{resize:vertical}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:15px;cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}.btn.wa{background:#1B8F4B;border-color:#1B8F4B;color:#fff}.btn.dn{background:transparent;color:var(--bad);border-color:var(--bad)}
+.btn.xs{min-height:34px;padding:0 11px;font-size:13px}.btn.chalk{background:var(--chalk-y);border-color:var(--chalk-y);color:#1A1A0C;font-size:16px;min-height:48px}.btn.gc{background:transparent;border-color:rgba(244,241,230,.6);color:var(--chalk)}
+.chip{display:inline-flex;align-items:center;min-height:26px;padding:1px 10px;border-radius:999px;font-size:13px;font-weight:600;background:var(--surface2)}.chip.good{background:var(--good-bg);color:var(--good)}.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.bc{border:1px solid var(--line);min-height:36px;cursor:pointer;background:var(--surface)}.bc.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.chips{display:flex;gap:6px;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}.tile b{display:block;font-family:var(--fd);font-weight:400;font-size:26px}.tile span{font-size:14px;color:var(--muted)}
+.banner{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;font-weight:600}.banner span{flex:1 1 220px}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.seg{display:flex;gap:8px}.seg .btn{flex:0 0 56px;font-size:22px;min-height:48px;padding:0}.seg .btn.p.on{background:var(--good-bg);color:var(--good);border-color:var(--good)}.seg .btn.a.on{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+.sc{overflow-x:auto;border:1px solid var(--line);border-radius:6px}table{border-collapse:collapse;font-size:14px;width:100%}th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;white-space:nowrap}th{background:var(--surface2)}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--surface)}td.P{background:var(--good-bg);color:var(--good);font-weight:700}td.A{background:var(--bad-bg);color:var(--bad);font-weight:700}
+.big{width:100%}.mrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.mrow input{width:90px;text-align:center}
+.done{text-decoration:line-through;opacity:.6}.foot{margin-top:22px;padding-top:14px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:14px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:6px;z-index:20;font-weight:600}
+@media (min-width:560px){.tiles{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header id="hdr"></header>
+<nav class="tabs" id="tabs" role="tablist"></nav>
+<main id="panel"></main>
+<footer class="foot">ही वेबसाईट बनवली: <strong>सुयोग</strong><br>This website created by <strong>Suyog</strong></footer>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+(function(){
+'use strict';
+const KEY='coachingClassManager.v1';
+const DAYS=['सोमवार','मंगळवार','बुधवार','गुरुवार','शुक्रवार','शनिवार','रविवार'];
+const MON=['जाने','फेब्रु','मार्च','एप्रि','मे','जून','जुलै','ऑग','सप्टें','ऑक्टो','नोव्हें','डिसें'];
+const CLS=['१ ली','२ री','३ री','४ थी','५ वी','६ वी','७ वी','८ वी','९ वी','१० वी'];
+const PRE=['आज वर्गात गैरहजर होता','गृहपाठ पूर्ण केला नाही','वर्गात गोंधळ करतो','अभ्यासात लक्ष नाही','फी बाकी आहे'];
+const TABS=[['dash','डॅशबोर्ड'],['stu','विद्यार्थी'],['att','हजेरी'],['reg','सर्व हजेरी'],['all','सर्व माहिती'],['fee','फी'],['marks','टेस्ट गुण'],['tt','वेळापत्रक'],['not','सूचना'],['hw','गृहपाठ'],['set','सेटिंग्ज']];
+const $=(s)=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10),z=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()),today=()=>ymd(new Date());
+const fd=s=>{if(!s)return'';const p=s.split('-');return (+p[2])+' '+MON[+p[1]-1]+' '+p[0]};
+const inr=n=>'₹'+Number(n||0).toLocaleString('en-IN');
+const first=s=>Array.from(String(s||'').trim())[0]||'?';
+function seed(){const t=today(),i=[1,2,3,4,5].map(uid),y=ymd(new Date(Date.now()-864e5));
+return{name:'सर्वज्ञ कोचिंग क्लासेस',tag:'शिक्षणाची नवी दिशा',sample:true,theme:'',
+students:[{id:i[0],name:'आर्यन पाटील',phone:'9000000001',batch:'१० वी',fee:12000,pay:[{amt:8000,date:t}]},{id:i[1],name:'सानिका देशमुख',phone:'9000000002',batch:'१० वी',fee:12000,pay:[{amt:12000,date:t}]},{id:i[2],name:'ओम कुलकर्णी',phone:'9000000003',batch:'१ ली',fee:18000,pay:[{amt:6000,date:t}]},{id:i[3],name:'प्रतीक्षा जाधव',phone:'9000000004',batch:'१ ली',fee:18000,pay:[{amt:18000,date:t}]},{id:i[4],name:'रोहन शिंदे',phone:'9000000005',batch:'१० वी',fee:12000,pay:[{amt:3000,date:t}]}],
+att:{[t]:{[i[0]]:'P',[i[1]]:'P',[i[2]]:'A',[i[3]]:'P',[i[4]]:'P'},[y]:{[i[0]]:'P',[i[1]]:'A',[i[2]]:'P',[i[3]]:'A',[i[4]]:'P'}},
+tests:[{id:uid(),title:'साप्ताहिक टेस्ट १',max:50,date:t,scores:{[i[0]]:38,[i[1]]:46,[i[4]]:27}}],
+tt:[{id:uid(),day:'सोमवार',time:'07:00',subject:'सराव टेस्ट',batch:'१० वी'}],
+notices:[{id:uid(),text:'रविवारी सकाळी ८ वाजता १० वी ची सराव परीक्षा आहे. सर्वांनी वेळेवर यावे.',date:t}],
+hw:[{id:uid(),batch:'१० वी',subject:'गणित',text:'भूमिती सराव संच ३.२ सोडवा.',due:t,done:false}]}}
+function norm(o){o.name=o.name||'तुमच्या क्लासचे नाव';o.tag=o.tag||'';o.theme=o.theme||'';o.students=(o.students||[]).map(s=>Object.assign({pay:[],fee:0,batch:'',phone:''},s));['tests','tt','notices','hw'].forEach(k=>o[k]=o[k]||[]);o.att=o.att||{};return o}
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.students))return norm(o)}}catch(e){}return null}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let S=load()||seed();
+const ui={tab:'dash',q:'',batch:'',date:today(),rc:CLS[0],rm:today().slice(0,7),test:null,edit:false};const dr={};
+const paid=s=>s.pay.reduce((a,p)=>a+Number(p.amt||0),0),pend=s=>Math.max(0,Number(s.fee||0)-paid(s));
+const bat=()=>{const a=CLS.slice();S.students.forEach(s=>{if(s.batch&&a.indexOf(s.batch)<0)a.push(s.batch)});return a};
+function wa(p,m){let d=String(p||'').replace(/\D/g,'');if(d.length===10)d='91'+d;return 'https://wa.me/'+d+'?text='+encodeURIComponent(m)}
+let tt;function toast(m){const e=$('#toast');e.textContent=m;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,2600)}
+/* file saving: Files app via downloads capability, fallback to normal download */
+function panel(n,t){let o=document.getElementById('pn');if(o)o.remove();o=document.createElement('div');o.id='pn';o.style.cssText='position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:16px';o.innerHTML='<div class="card" style="width:min(560px,100%);max-height:90vh;overflow:auto"><h3>डाउनलोड झाले नाही? येथून घ्या</h3><p class="sub">"कॉपी करा" दाबा, नंतर Notes किंवा Files मध्ये पेस्ट करून <b>'+esc(n)+'</b> नावाने सेव्ह करा.</p><textarea id="pt" rows="8" readonly></textarea><div class="row"><button class="btn" id="pc">कॉपी करा</button><button class="btn ghost" id="px">बंद</button></div></div>';document.body.appendChild(o);const ta=o.querySelector('#pt');ta.value=t;o.querySelector('#px').onclick=()=>o.remove();o.querySelector('#pc').onclick=()=>{ta.select();const ok=()=>toast('कॉपी झाले');try{navigator.clipboard.writeText(t).then(ok,()=>{document.execCommand('copy');ok()})}catch(e){try{document.execCommand('copy');ok()}catch(x){}}}}
+let DLP=null;try{if(window.claude&&claude.use)DLP=claude.use('downloads')}catch(e){}
+function saveFile(name,text,mime,alt){const blob=new Blob(['\ufeff'+text],{type:mime});
+const fb=()=>{try{const f=new File([blob],name,{type:mime});if(window.claude&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).catch(()=>panel(name,text));return}}catch(e){}try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove()}catch(e){}if(window.claude)panel(name,text);else toast('फाईल डाउनलोड होत आहे')};
+toast('फाईल तयार होत आहे… परवानगी विचारल्यास Allow करा');if(DLP){DLP.then(d=>{if(!d){fb();return}d.save({filename:name,data:'\ufeff'+text}).then(()=>toast('फाईल सेव्ह झाली'),e=>{if(e&&alt&&/extension/.test(e.code||'')){alt();return}if(e&&e.code==='declined'){toast('तुम्ही सेव्ह नाकारले');return}toast('सेव्ह झाले नाही ('+((e&&e.code)||'error')+')');fb()})},fb);return}fb()}
+const csv=r=>r.map(x=>x.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(',')).join('\n');
+function regDays(b,m){const d=[];for(const k in S.att){if(S.students.some(s=>s.batch===b&&S.att[k][s.id])&&d.indexOf(k)<0)d.push(k)}return d.sort()}
+function regRows(b,m){const days=regDays(b,m),r=[['नाव'].concat(days.map(fd),['उपस्थित','गैरहजर','टक्के'])];
+S.students.filter(s=>s.batch===b).forEach(s=>{let p=0,a=0;const c=days.map(d=>{const v=S.att[d][s.id];if(v==='P')p++;if(v==='A')a++;return v==='P'?'उपस्थित':v==='A'?'गैरहजर':'-'});r.push([s.name].concat(c,[p,a,(p+a?Math.round(p*100/(p+a)):0)+'%']))});return r}
+function dlAll(){const all=[['वर्ग','विद्यार्थी','मोबाईल','तारीख','हजेरी']];
+S.students.forEach(s=>Object.keys(S.att).sort().forEach(d=>{const v=S.att[d][s.id];if(v)all.push([s.batch,s.name,s.phone,d,v==='P'?'उपस्थित':'गैरहजर'])}));
+saveFile('sarva_data_'+today()+'.json',JSON.stringify({exported:today(),data:S},null,2),'application/json')}
+function dlCsv(){const st=S.students,pa=v=>v==='P'?'P':'A',dates=Object.keys(S.att).sort(),r=[];
+r.push([S.name+' – सर्व माहिती',today()],[]);
+r.push(['१. विद्यार्थी'],['नाव','वर्ग','मोबाईल']);st.forEach(s=>r.push([s.name,s.batch,s.phone]));r.push([]);
+r.push(['२. हजेरी (P = उपस्थित, A = गैरहजर)'],['वर्ग','विद्यार्थी','मोबाईल','तारीख','P/A']);bat().forEach(b=>st.filter(s=>s.batch===b).forEach(s=>dates.forEach(d=>{const v=S.att[d][s.id];if(v)r.push([b,s.name,s.phone,d,pa(v)])})));r.push([]);
+r.push(['३. फी'],['नाव','वर्ग','एकूण फी','जमा','बाकी','भरणा (तारीख: रक्कम)']);st.forEach(s=>r.push([s.name,s.batch,s.fee,paid(s),pend(s),s.pay.map(p=>p.date+': '+p.amt).join(' | ')]));r.push([]);
+r.push(['४. टेस्ट गुण'],['टेस्ट','तारीख','एकूण गुण','विद्यार्थी','मिळालेले गुण']);S.tests.forEach(t=>st.forEach(s=>r.push([t.title,t.date,t.max,s.name,t.scores[s.id]!=null?t.scores[s.id]:''])));r.push([]);
+r.push(['५. वेळापत्रक'],['वार','वेळ','विषय','वर्ग']);DAYS.forEach(d=>S.tt.filter(x=>x.day===d).sort((a,b)=>a.time.localeCompare(b.time)).forEach(x=>r.push([x.day,x.time,x.subject,x.batch])));r.push([]);
+r.push(['६. सूचना'],['तारीख','सूचना']);S.notices.forEach(n=>r.push([n.date,n.text]));r.push([]);
+r.push(['७. गृहपाठ'],['वर्ग','विषय','गृहपाठ','अंतिम तारीख','स्थिती']);S.hw.forEach(x=>r.push([x.batch,x.subject,x.text,x.due,x.done?'पूर्ण':'चालू']));
+saveFile('sarva_mahiti_'+today()+'.csv',csv(r),'text/csv')}
+function repHtml(){const st=S.students,dates=Object.keys(S.att).sort(),e=esc,box=(t,b)=>'<section><h2>'+t+'</h2>'+b+'</section>',tb=(hd,rows)=>'<div class="sc"><table><tr>'+hd.map(x=>'<th>'+x+'</th>').join('')+'</tr>'+rows.map(r=>'<tr>'+r.map(x=>'<td>'+x+'</td>').join('')+'</tr>').join('')+'</table></div>',no='<p class="m">काहीही नाही</p>';
+let h=box('१. विद्यार्थी ('+st.length+')',st.length?tb(['नाव','वर्ग','मोबाईल'],st.map(s=>[e(s.name),e(s.batch),e(s.phone)])):no);
+h+=box('२. हजेरी (P = उपस्थित, A = गैरहजर)',bat().filter(b=>st.some(s=>s.batch===b)).map(b=>'<h3>'+e(b)+'</h3>'+st.filter(s=>s.batch===b).map(s=>{const ds=dates.filter(d=>S.att[d][s.id]);let p=0;ds.forEach(d=>{if(S.att[d][s.id]==='P')p++});return '<div class="st"><div class="sn"><b>'+e(s.name)+'</b><span>P '+p+' · A '+(ds.length-p)+'</span></div><div class="ch">'+(ds.length?ds.map(d=>'<i class="'+(S.att[d][s.id]==='P'?'g':'r')+'">'+fd(d)+' '+S.att[d][s.id]+'</i>').join(''):'<span class="m">हजेरी नाही</span>')+'</div></div>'}).join('')).join('')||no);
+h+=box('३. फी',st.map(s=>'<div class="st"><div class="sn"><b>'+e(s.name)+'</b><span>'+e(s.batch)+'</span></div><p>एकूण '+inr(s.fee)+' · जमा '+inr(paid(s))+' · <b>बाकी '+inr(pend(s))+'</b></p>'+(s.pay.length?'<p class="m">'+s.pay.map(p=>fd(p.date)+': '+inr(p.amt)).join(' | ')+'</p>':'')+'</div>').join('')||no);
+h+=box('४. टेस्ट गुण',S.tests.map(t=>'<div class="st"><div class="sn"><b>'+e(t.title)+'</b><span>'+fd(t.date)+' · एकूण '+t.max+'</span></div>'+tb(['नाव','गुण'],st.map(s=>[e(s.name),t.scores[s.id]!=null?t.scores[s.id]+' / '+t.max:'-']))+'</div>').join('')||no);
+h+=box('५. वेळापत्रक',DAYS.map(d=>{const l=S.tt.filter(x=>x.day===d).sort((a,b)=>a.time.localeCompare(b.time));return l.length?'<div class="st"><b>'+d+'</b>'+l.map(x=>'<p>'+e(x.time)+' · '+e(x.subject)+' ('+e(x.batch)+')</p>').join('')+'</div>':''}).join('')||no);
+h+=box('६. सूचना',S.notices.map(n=>'<div class="st"><p>'+e(n.text)+'</p><p class="m">'+fd(n.date)+'</p></div>').join('')||no);
+h+=box('७. गृहपाठ',S.hw.map(x=>'<div class="st"><div class="sn"><b>'+e(x.subject)+' ('+e(x.batch)+')</b><span>'+(x.done?'पूर्ण':'चालू')+'</span></div><p>'+e(x.text)+'</p><p class="m">अंतिम तारीख: '+fd(x.due)+'</p></div>').join('')||no);
+const css='body{font-family:system-ui,"Noto Sans Devanagari",sans-serif;background:#EDF2EF;color:#14211D;margin:0;padding:14px;max-width:760px;margin:auto}h1{background:#16312A;color:#F4F1E6;border:5px solid #8B5E34;padding:14px;margin:0 0 6px;font-size:24px}section{background:#fff;border:1px solid #C9D5CF;border-radius:8px;padding:12px;margin:12px 0}h2{margin:0 0 8px;font-size:18px}h3{margin:12px 0 4px;color:#1B6B57}.st{border:1px solid #C9D5CF;border-radius:8px;padding:10px;margin:8px 0}.sn{display:flex;justify-content:space-between;gap:8px}.sn span,.m{color:#566660;font-size:14px}p{margin:4px 0}.ch{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}i{font-style:normal;font-size:13px;padding:2px 9px;border-radius:12px}i.g{background:#DCF1E4;color:#1E7D4F}i.r{background:#F9DAD4;color:#B3321F}.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #C9D5CF;padding:5px 8px;text-align:left}th{background:#E3EBE7}';
+return '<!doctype html><html lang="mr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+e(S.name)+'</title><style>'+css+'</style></head><body><h1>'+e(S.name)+' – सर्व माहिती</h1><p class="m">तारीख: '+fd(today())+'</p>'+h+'</body></html>'}
+function repPng(only,bt){const W=720,P=14,F=`'Noto Sans Devanagari',Mukta,system-ui,sans-serif`,m=document.createElement('canvas').getContext('2d'),fo=(s,b)=>(b?'700 ':'400 ')+s+'px '+F,items=[],st=S.students,dates=Object.keys(S.att).sort();
+const wrap=(t,w,f)=>{m.font=f;const o=[];String(t).split('\n').forEach(par=>{let l='';par.split(' ').forEach(wd=>{const x=l?l+' '+wd:wd;if(m.measureText(x).width>w&&l){o.push(l);l=wd}else l=x});o.push(l)});return o};
+const rr=(c,x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()};
+const iw=W-2*P-24;let CUR='0';
+function card(o){const tl=wrap(o.t,iw-(o.r?170:0),fo(17,1));let ll=[];(o.lines||[]).forEach(x=>{ll=ll.concat(wrap(x,iw,fo(15)))});const cp=[];let x=0,y=0;if(o.chips&&o.chips.length){m.font=fo(14,1);o.chips.forEach(c=>{const w=m.measureText(c.t).width+18;if(x+w>iw&&x>0){x=0;y+=30}cp.push({x,y,w,c});x+=w+6})}const ch=cp.length?y+30:0,bh=12+tl.length*24+(ll.length?4+ll.length*21:0)+(ch?6+ch:0)+8;
+items.push({sec:CUR,h:bh+10,draw(c,y0){c.fillStyle='#fff';rr(c,P,y0,W-2*P,bh,8);c.fill();c.strokeStyle='#C9D5CF';c.lineWidth=1;c.stroke();c.textBaseline='top';c.textAlign='left';c.fillStyle='#14211D';c.font=fo(17,1);tl.forEach((l,i)=>c.fillText(l,P+12,y0+10+i*24));if(o.r){c.textAlign='right';c.fillStyle='#566660';c.font=fo(14);c.fillText(o.r,W-P-12,y0+12);c.textAlign='left'}let yy=y0+12+tl.length*24;if(ll.length){yy+=4;c.fillStyle='#14211D';c.font=fo(15);ll.forEach((l,i)=>c.fillText(l,P+12,yy+i*21));yy+=ll.length*21}if(cp.length){yy+=6;cp.forEach(q=>{c.fillStyle=q.c.g?'#DCF1E4':'#F9DAD4';rr(c,P+12+q.x,yy+q.y,q.w,24,12);c.fill();c.fillStyle=q.c.g?'#1E7D4F':'#B3321F';c.font=fo(14,1);c.fillText(q.c.t,P+12+q.x+9,yy+q.y+4)})}}})}
+function bar(t,sub){if(!sub)CUR=t.charAt(0);items.push({sec:CUR,h:sub?38:52,keep:1,draw(c,y0){if(sub){c.fillStyle='#1B6B57';c.font=fo(17,1);c.textBaseline='top';c.fillText(t,P+4,y0+6)}else{c.fillStyle='#1B6B57';rr(c,P,y0+6,W-2*P,40,8);c.fill();c.fillStyle='#fff';c.font=fo(19,1);c.textBaseline='top';c.fillText(t,P+14,y0+14)}}})}
+items.push({sec:'0',h:100,draw(c,y0){c.fillStyle='#16312A';c.fillRect(P,y0,W-2*P,88);c.strokeStyle='#8B5E34';c.lineWidth=5;c.strokeRect(P,y0,W-2*P,88);c.textBaseline='top';c.fillStyle='#F4F1E6';c.font=fo(26,1);c.fillText(S.name,P+16,y0+14);c.font=fo(16);c.fillText('सर्व माहिती · तारीख: '+fd(today()),P+16,y0+54)}});
+const none=()=>card({t:'काहीही नाही'});
+bar('१. विद्यार्थी ('+st.length+')');st.length?st.forEach(s=>card({t:s.name,r:s.batch,lines:['मोबाईल: '+(s.phone||'-')]})):none();
+bar('२. हजेरी (P = उपस्थित, A = गैरहजर)');let anyA=0;bat().filter(b=>st.some(s=>s.batch===b)&&(!bt||b===bt)).forEach(b=>{anyA=1;bar(b,1);st.filter(s=>s.batch===b).forEach(s=>{const ds=dates.filter(d=>S.att[d][s.id]);let p=0;ds.forEach(d=>{if(S.att[d][s.id]==='P')p++});card({t:s.name,r:'P '+p+' · A '+(ds.length-p),lines:ds.length?[]:['हजेरी नाही'],chips:ds.map(d=>({t:fd(d)+' '+S.att[d][s.id],g:S.att[d][s.id]==='P'}))})})});if(!anyA)none();
+bar('३. फी');st.length?st.forEach(s=>card({t:s.name,r:s.batch,lines:['एकूण '+inr(s.fee)+' · जमा '+inr(paid(s))+' · बाकी '+inr(pend(s))].concat(s.pay.length?['भरणा: '+s.pay.map(p=>fd(p.date)+' '+inr(p.amt)).join(' | ')]:[])})):none();
+bar('४. टेस्ट गुण');S.tests.length?S.tests.forEach(t=>card({t:t.title,r:fd(t.date)+' · एकूण '+t.max,lines:st.map(s=>s.name+' — '+(t.scores[s.id]!=null?t.scores[s.id]+' / '+t.max:'-'))})):none();
+bar('५. वेळापत्रक');let anyT=0;DAYS.forEach(d=>{const l=S.tt.filter(x=>x.day===d).sort((a,b)=>a.time.localeCompare(b.time));if(l.length){anyT=1;card({t:d,lines:l.map(x=>x.time+' · '+x.subject+' ('+x.batch+')')})}});if(!anyT)none();
+bar('६. सूचना');S.notices.length?S.notices.forEach(n=>card({t:fd(n.date),lines:[n.text]})):none();
+bar('७. गृहपाठ');S.hw.length?S.hw.forEach(x=>card({t:x.subject+' ('+x.batch+')',r:x.done?'पूर्ण':'चालू',lines:[x.text,'अंतिम तारीख: '+fd(x.due)]})):none();
+const pages=[];let cur=[],hh=14;(only?items.filter(i=>i.sec==='0'||only.indexOf(i.sec)>=0):items).forEach((it,i)=>{if(hh+it.h>14000&&cur.length){pages.push(cur);cur=[];hh=14}cur.push(it);hh+=it.h});pages.push(cur);
+return pages.map(pg=>{const hs=pg.reduce((a,b)=>a+b.h,14),cv=document.createElement('canvas');cv.width=W;cv.height=hs+10;const c=cv.getContext('2d');c.fillStyle='#EDF2EF';c.fillRect(0,0,W,cv.height);let y=14;pg.forEach(it=>{it.draw(c,y);y+=it.h});return cv})}
+function savePng(pages,i){if(i>=pages.length)return;const name=(window.PN||'sarva_mahiti')+'_'+today()+(pages.length>1?'_'+(i+1):'')+'.png';pages[i].toBlob(b=>{const next=()=>savePng(pages,i+1),fb=()=>{try{const f=new File([b],name,{type:'image/png'});if(window.claude&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).then(next,()=>{});return}}catch(e){}const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(next,500)};if(DLP)DLP.then(d=>{if(!d){fb();return}d.save({filename:name,data:b}).then(()=>{toast('फाईल सेव्ह झाली ('+(i+1)+'/'+pages.length+')');next()},e=>{if(e&&e.code==='declined'){toast('तुम्ही सेव्ह नाकारले');return}toast('सेव्ह झाले नाही ('+((e&&e.code)||'error')+')');fb()})},fb);else fb()},'image/png')}
+function dlFull(){toast('फोटो तयार होत आहे… परवानगी विचारल्यास Allow करा');setTimeout(()=>{try{savePng(repPng(),0)}catch(e){dlCsv()}},60)}
+function dlPng(only,bt,pn){window.PN=pn;toast('फोटो तयार होत आहे… परवानगी विचारल्यास Allow करा');setTimeout(()=>{try{savePng(repPng(only,bt),0)}catch(e){toast('फोटो बनवता आला नाही')}},60)}
+function dlReg(){saveFile('hajeri_'+ui.rc.replace(/\s/g,'')+'_'+ui.rm+'.csv',csv(regRows(ui.rc,ui.rm)),'text/csv')}
+function dlAttCsv(){const r=[['वर्ग','विद्यार्थी','मोबाईल','तारीख','हजेरी']];S.students.forEach(s=>Object.keys(S.att).sort().forEach(d=>{const v=S.att[d][s.id];if(v)r.push([s.batch,s.name,s.phone,d,v==='P'?'उपस्थित':'गैरहजर'])}));saveFile('sarva_hajeri_'+today()+'.csv',csv(r),'text/csv')}
+const ban=()=>S.sample?'<div class="banner"><span>हा उदाहरण डेटा आहे, फक्त दाखवण्यासाठी. स्वतःचा डेटा टाकण्यापूर्वी तो काढा.</span><button class="btn xs" data-act="clr">उदाहरण डेटा काढा</button></div>':'';
+const opts=(a,v)=>a.map(x=>'<option'+(x===v?' selected':'')+'>'+esc(x)+'</option>').join('');
+const none=m=>'<div class="card"><p class="sub">'+m+'</p></div>';
+function hdr(){const h=$('#hdr');
+if(ui.edit)h.innerHTML='<form class="board" id="nf"><div><label class="lbl" for="ni">क्लासचे नाव</label><input id="ni" value="'+esc(S.name)+'" maxlength="60"></div><div><label class="lbl" for="ti">नावाखालील ओळ</label><input id="ti" value="'+esc(S.tag)+'" maxlength="80"></div><div class="row"><button class="btn chalk" type="submit">सेव्ह करा</button><button class="btn gc" type="button" data-act="cn">रद्द</button></div></form>';
+else h.innerHTML='<div class="board"><div class="bTop"><div class="logo">'+esc(first(S.name))+'</div><div><h1>'+esc(S.name)+'</h1>'+(S.tag?'<p class="tag">'+esc(S.tag)+'</p>':'')+'</div></div><button class="btn chalk big" data-go="all">👁 सर्व माहिती पाहा (All View)</button><div class="bBtns"><button class="btn xs gc" data-act="en">नाव बदला</button><button class="btn xs gc" data-act="th">गडद / उजळ</button></div></div>'}
+function tabs(){const e=$('#tabs'),l=e.scrollLeft;e.innerHTML=TABS.map(t=>'<button class="tab" role="tab" aria-selected="'+(ui.tab===t[0])+'" data-tab="'+t[0]+'">'+t[1]+'</button>').join('');e.scrollLeft=l}
+const P={};
+P.dash=()=>{const t=today(),d=S.att[t]||{},m=S.students.filter(s=>d[s.id]),pr=m.filter(s=>d[s.id]==='P').length,ab=S.students.filter(s=>d[s.id]==='A'),pe=S.students.reduce((a,s)=>a+pend(s),0),co=S.students.reduce((a,s)=>a+paid(s),0),dn=DAYS[(new Date().getDay()+6)%7],tl=S.tt.filter(x=>x.day===dn).sort((a,b)=>a.time.localeCompare(b.time)),n=S.notices.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
+return ban()+'<div class="tiles"><div class="tile"><b>'+S.students.length+'</b><span>एकूण विद्यार्थी</span></div><div class="tile"><b>'+(m.length?pr+'/'+m.length:'—')+'</b><span>आज उपस्थित</span></div><div class="tile"><b>'+inr(pe)+'</b><span>फी बाकी</span></div><div class="tile"><b>'+S.hw.filter(h=>!h.done).length+'</b><span>चालू गृहपाठ</span></div></div>'+
+'<section class="card"><h2>आजची हजेरी</h2>'+(m.length?(ab.length?ab.map(s=>'<div class="item"><span><strong>'+esc(s.name)+'</strong> <span class="chip bad">गैरहजर</span></span><a class="btn xs wa" target="_blank" rel="noopener" href="'+esc(wa(s.phone,'नमस्कार, '+s.name+' आज ('+fd(t)+') '+S.name+' मध्ये गैरहजर आहे.'))+'">पालकांना कळवा</a></div>').join(''):'<p class="sub">आज सर्व उपस्थित आहेत.</p>'):'<p class="sub">आजची हजेरी अजून घेतलेली नाही.</p>')+'<div class="row"><button class="btn" data-go="att">हजेरी घ्या</button><button class="btn ghost" data-go="reg">सर्व हजेरी पाहा</button></div></section>'+
+'<section class="card"><h2>आजचे वेळापत्रक ('+dn+')</h2>'+(tl.length?tl.map(x=>'<div class="item"><span><strong>'+esc(x.time)+'</strong> '+esc(x.subject)+'</span><span class="chip">'+esc(x.batch)+'</span></div>').join(''):'<p class="sub">आज कोणताही तास नाही.</p>')+'</section>'+
+'<section class="card"><h2>फी वसुली</h2><div class="item"><span>जमा झालेली फी</span><strong>'+inr(co)+'</strong></div><div class="item"><span>बाकी फी</span><strong>'+inr(pe)+'</strong></div><div class="row"><button class="btn ghost" data-go="fee">फी पाहा</button></div></section>'+(n?'<section class="card"><h2>ताजी सूचना</h2><p class="pre">'+esc(n.text)+'</p><p class="sub">'+fd(n.date)+'</p></section>':'')};
+function filt(){const q=ui.q.trim().toLowerCase();return S.students.filter(s=>(!ui.batch||s.batch===ui.batch)&&(!q||s.name.toLowerCase().includes(q)||String(s.phone).includes(q)))}
+const bsel=()=>'<div><label class="lbl" for="bs">वर्ग / बॅच</label><select id="bs"><option value="">सर्व</option>'+bat().map(b=>'<option'+(b===ui.batch?' selected':'')+'>'+esc(b)+'</option>').join('')+'</select></div>';
+P.stu=()=>{const l=filt();return ban()+'<form class="card" id="af"><h2>नवीन विद्यार्थी</h2><div class="form"><div><label class="lbl" for="an">नाव</label><input id="an" required></div><div><label class="lbl" for="ap">पालकांचा मोबाईल</label><input id="ap" inputmode="numeric"></div><div><label class="lbl" for="ab">वर्ग</label><select id="ab">'+opts(bat().concat(['१२ वी']))+'</select></div><div><label class="lbl" for="af2">एकूण फी ₹</label><input id="af2" type="number" min="0"></div></div><button class="btn" type="submit">विद्यार्थी जोडा</button></form>'+
+'<div class="form"><div><label class="lbl" for="q">शोधा</label><input id="q" type="search" value="'+esc(ui.q)+'" placeholder="नाव किंवा मोबाईल"></div>'+bsel()+'</div>'+
+(l.length?l.map(s=>{const t=dr[s.id]!==undefined?dr[s.id]:'नमस्कार पालक,\n'+S.name+' कडून सूचना.\nविद्यार्थी: '+s.name+'\nतक्रार: ';return '<section class="card"><div class="item"><h3>'+esc(s.name)+'</h3><span class="chip">'+esc(s.batch)+'</span></div><p class="sub">मोबाईल: <span class="sel">'+esc(s.phone)+'</span></p><div class="chips">'+PRE.map((p,i)=>'<button class="chip bc" data-act="pre" data-id="'+s.id+'" data-i="'+i+'">'+esc(p)+'</button>').join('')+'</div><textarea class="cmp" data-id="'+s.id+'" rows="4">'+esc(t)+'</textarea><div class="row"><a id="w'+s.id+'" class="btn wa" target="_blank" rel="noopener" href="'+esc(wa(s.phone,t))+'">WhatsApp वर तक्रार पाठवा</a><button class="btn dn xs" data-act="ds" data-id="'+s.id+'">काढा</button></div></section>'}).join(''):none('विद्यार्थी सापडले नाहीत.'))};
+P.att=()=>{const l=filt(),d=S.att[ui.date]||{};return '<section class="card"><h2>हजेरी घ्या</h2><p><b>P</b> दाबा = उपस्थित (प्रेझेंट)<br><b>A</b> दाबा = गैरहजर (अब्सेंट)</p><div class="form"><div><label class="lbl" for="ad">तारीख</label><input id="ad" type="date" value="'+ui.date+'"></div>'+bsel()+'</div><button class="btn ghost" data-act="allp">सर्व उपस्थित करा</button><button class="btn" data-act="dlatb">हजेरी डाउनलोड (फोटो)</button></section>'+
+(l.length?'<section class="card">'+l.map(s=>'<div class="item"><span><strong>'+esc(s.name)+'</strong> <span class="sub">'+esc(s.batch)+'</span><br>'+(d[s.id]==='P'?'<span class="chip good">उपस्थित</span>':d[s.id]==='A'?'<span class="chip bad">गैरहजर</span>':'<span class="chip">अजून नाही</span>')+'</span><div class="seg"><button class="btn p'+(d[s.id]==='P'?' on':'')+'" data-act="mk" data-id="'+s.id+'" data-v="P" aria-label="उपस्थित">P</button><button class="btn a'+(d[s.id]==='A'?' on':'')+'" data-act="mk" data-id="'+s.id+'" data-v="A" aria-label="गैरहजर">A</button></div></div>').join('')+'</section>':none('विद्यार्थी नाहीत.'))};
+P.reg=()=>{const l=S.students.filter(s=>s.batch===ui.rc),days=regDays(ui.rc,ui.rm),rows=regRows(ui.rc,ui.rm);
+const th='<tr>'+rows[0].map(x=>'<th>'+esc(x.length>5&&x!=='उपस्थित'&&x!=='गैरहजर'?x:x)+'</th>').join('')+'</tr>';
+const body=rows.slice(1).map(r=>'<tr>'+r.map((c,i)=>'<td'+(c==='उपस्थित'&&i>0&&i<=days.length?' class="P"':c==='गैरहजर'&&i>0&&i<=days.length?' class="A"':'')+'>'+(c==='उपस्थित'&&i<=days.length?'P':c==='गैरहजर'&&i<=days.length?'A':esc(c))+'</td>').join('')+'</tr>').join('');
+return '<section class="card"><h2>सर्व हजेरी – वर्गनिहाय</h2><div class="chips">'+CLS.concat(bat().filter(b=>CLS.indexOf(b)<0)).map(c=>'<button class="chip bc'+(c===ui.rc?' on':'')+'" data-act="rc" data-v="'+esc(c)+'">'+esc(c)+'</button>').join('')+'</div><div><label class="lbl" for="rm">महिना</label><input id="rm" type="month" value="'+ui.rm+'"></div><p class="sub">P = उपस्थित (प्रेझेंट), A = गैरहजर (अब्सेंट). तारखा वरच्या ओळीत आहेत.</p></section>'+
+(l.length?(days.length?'<div class="sc"><table>'+th+body+'</table></div>':none('या महिन्यात '+esc(ui.rc)+' ची हजेरी घेतलेली नाही.')):none(esc(ui.rc)+' मध्ये विद्यार्थी नाहीत.'))+
+'<div class="row"><button class="btn" data-act="dlreg">'+esc(ui.rc)+' ची हजेरी डाउनलोड (Excel/CSV)</button><button class="btn ghost" data-act="dlattcsv">सर्व वर्गांची हजेरी डाउनलोड</button></div>'};
+P.fee=()=>ban()+(S.students.length?S.students.map(s=>{const p=paid(s),pc=s.fee?Math.min(100,Math.round(p*100/s.fee)):0;return '<section class="card"><div class="item"><h3>'+esc(s.name)+'</h3><span class="chip '+(pend(s)?'bad':'good')+'">'+(pend(s)?'बाकी '+inr(pend(s)):'पूर्ण भरली')+'</span></div><p class="sub">'+esc(s.batch)+' · जमा '+inr(p)+' / '+inr(s.fee)+' ('+pc+'%)</p><div class="row"><input type="number" min="1" placeholder="रक्कम ₹" id="pa'+s.id+'" style="flex:1"><button class="btn" data-act="pay" data-id="'+s.id+'">फी भरा</button></div></section>'}).join(''):none('विद्यार्थी नाहीत.'));
+P.marks=()=>{const t=S.tests.find(x=>x.id===ui.test)||S.tests[0];if(t)ui.test=t.id;const l=filt();
+return '<form class="card" id="tf"><h2>नवीन टेस्ट</h2><div class="form"><div><label class="lbl" for="tn">टेस्टचे नाव</label><input id="tn" required></div><div><label class="lbl" for="tm">एकूण गुण</label><input id="tm" type="number" value="50" min="1"></div></div><button class="btn" type="submit">टेस्ट जोडा</button></form>'+
+(t?'<section class="card"><div class="chips">'+S.tests.map(x=>'<button class="chip bc'+(x.id===t.id?' on':'')+'" data-act="st" data-id="'+x.id+'">'+esc(x.title)+'</button>').join('')+'</div>'+bsel()+l.map(s=>'<div class="mrow"><span>'+esc(s.name)+'</span><span><input type="number" class="sc2" data-id="'+s.id+'" value="'+(t.scores[s.id]!=null?t.scores[s.id]:'')+'" min="0" max="'+t.max+'"> / '+t.max+'</span></div>').join('')+'<button class="btn dn xs" data-act="dt">ही टेस्ट काढा</button></section>':none('अजून टेस्ट नाही.'))};
+function regList(ds,id){let y='',h='';ds.forEach(d=>{const v=S.att[d][id];if(d.slice(0,4)!==y){y=d.slice(0,4);h+='<h4>'+y+'</h4>'}h+='<div class="item"><span>'+fd(d)+'</span><span class="chip '+(v==='P'?'good':'bad')+'">'+v+'</span></div>'});return h}
+P.reg=()=>{ui.open=ui.open||{};const l=S.students.filter(s=>s.batch===ui.rc),cl=CLS.concat(bat().filter(b=>CLS.indexOf(b)<0));
+return '<section class="card"><h2>सर्व हजेरी – वर्गनिहाय</h2><div class="chips">'+cl.map(c=>'<button class="chip bc'+(c===ui.rc?' on':'')+'" data-act="rc" data-v="'+esc(c)+'">'+esc(c)+'</button>').join('')+'</div><div class="row"><button class="btn ghost xs" data-act="showall">सर्व दाखवा</button><button class="btn ghost xs" data-act="hideall">सर्व लपवा</button></div><p class="sub">P = उपस्थित (प्रेझेंट), A = गैरहजर (अब्सेंट). विद्यार्थ्यापुढे "दाखवा" दाबल्यावर त्याची आजपर्यंतची सर्व तारखांची हजेरी दिसेल.</p></section>'+
+(l.length?l.map(s=>{const ds=Object.keys(S.att).filter(d=>S.att[d][s.id]).sort().reverse();let p=0,a=0;ds.forEach(d=>S.att[d][s.id]==='P'?p++:a++);const o=ui.open[s.id];
+return '<section class="card"><div class="item"><h3>'+esc(s.name)+'</h3><button class="btn xs'+(o?' ghost':'')+'" data-act="tg" data-id="'+s.id+'">'+(o?'लपवा':'दाखवा')+'</button></div><p class="sub">एकूण '+ds.length+' दिवस · P '+p+' · A '+a+(ds.length?' · '+Math.round(p*100/ds.length)+'%':'')+'</p>'+(o?(ds.length?regList(ds,s.id):'<p class="sub">अजून हजेरी नाही.</p>'):'')+'</section>'}).join(''):none(esc(ui.rc)+' मध्ये विद्यार्थी नाहीत.'))+
+'<div class="row"><button class="btn" data-act="dlrc">'+esc(ui.rc)+' ची हजेरी डाउनलोड (फोटो)</button><button class="btn ghost" data-act="dlatt">सर्व वर्गांची हजेरी डाउनलोड (फोटो)</button></div>'};
+P.all=()=>{const st=S.students,H=(t,n)=>'<h2>'+t+(n!=null?' <span class="chip">'+n+'</span>':'')+'</h2>',no='<p class="sub">काहीही नाही</p>',tb=(hd,rows)=>'<div class="sc"><table><tr>'+hd.map(x=>'<th>'+x+'</th>').join('')+'</tr>'+rows.join('')+'</table></div>',tr=a=>'<tr>'+a.map(x=>'<td>'+x+'</td>').join('')+'</tr>';
+let h='<section class="card"><h2>'+esc(S.name)+' – सर्व माहिती</h2><p class="sub">तारीख: '+fd(today())+'. खाली स्क्रोल करून लाँग स्क्रीनशॉट घेता येतो.</p></section>';
+h+='<section class="card">'+H('१. विद्यार्थी',st.length)+(st.length?tb(['नाव','वर्ग','मोबाईल'],st.map(s=>tr([esc(s.name),esc(s.batch),esc(s.phone)]))):no)+'</section>';
+const dates=Object.keys(S.att).sort();
+h+='<section class="card">'+H('२. हजेरी (सर्व तारखा)')+'<div class="row"><button class="btn ghost xs" data-act="oaA">सर्व दाखवा</button><button class="btn ghost xs" data-act="oaH">सर्व लपवा</button></div>'+(bat().filter(b=>st.some(s=>s.batch===b)).map(b=>'<h3>'+esc(b)+'</h3>'+st.filter(s=>s.batch===b).map(s=>{const ds=dates.filter(d=>S.att[d][s.id]);let p=0;ds.forEach(d=>{if(S.att[d][s.id]==='P')p++});ui.oa=ui.oa||{};const o=ui.oa[s.id];return '<div class="item" style="display:block"><div class="item" style="border:0;padding:0"><span><strong>'+esc(s.name)+'</strong> <span class="sub">P '+p+' · A '+(ds.length-p)+'</span></span><button class="btn xs'+(o?' ghost':'')+'" data-act="ta" data-id="'+s.id+'">'+(o?'लपवा':'दाखवा')+'</button></div>'+(o?'<div class="chips" style="margin-top:6px">'+(ds.length?ds.map(d=>'<span class="chip '+(S.att[d][s.id]==='P'?'good':'bad')+'">'+fd(d)+' '+S.att[d][s.id]+'</span>').join(''):'<span class="sub">हजेरी नाही</span>')+'</div>':'')+'</div>'}).join('')).join('')||no)+'</section>';
+h+='<section class="card">'+H('३. फी')+(st.length?tb(['नाव','वर्ग','एकूण','जमा','बाकी','भरणा'],st.map(s=>tr([esc(s.name),esc(s.batch),inr(s.fee),inr(paid(s)),inr(pend(s)),s.pay.map(p=>fd(p.date)+': '+inr(p.amt)).join('<br>')||'-']))):no)+'</section>';
+h+='<section class="card">'+H('४. टेस्ट गुण',S.tests.length)+(S.tests.map(t=>'<h3>'+esc(t.title)+' <span class="sub">(एकूण '+t.max+' · '+fd(t.date)+')</span></h3>'+tb(['नाव','गुण'],st.map(s=>tr([esc(s.name),t.scores[s.id]!=null?t.scores[s.id]+' / '+t.max:'-'])))).join('')||no)+'</section>';
+h+='<section class="card">'+H('५. वेळापत्रक')+(DAYS.map(d=>{const l=S.tt.filter(x=>x.day===d).sort((a,b)=>a.time.localeCompare(b.time));return l.length?'<h3>'+d+'</h3>'+l.map(x=>'<div class="item"><span><strong>'+esc(x.time)+'</strong> '+esc(x.subject)+'</span><span class="chip">'+esc(x.batch)+'</span></div>').join(''):''}).join('')||no)+'</section>';
+h+='<section class="card">'+H('६. सूचना',S.notices.length)+(S.notices.map(n=>'<div class="item"><span class="pre">'+esc(n.text)+'</span><span class="sub">'+fd(n.date)+'</span></div>').join('')||no)+'</section>';
+h+='<section class="card">'+H('७. गृहपाठ',S.hw.length)+(S.hw.map(x=>'<div class="item"><span><strong>'+esc(x.subject)+'</strong> <span class="chip">'+esc(x.batch)+'</span> '+(x.done?'<span class="chip good">पूर्ण</span>':'<span class="chip bad">चालू</span>')+'<br>'+esc(x.text)+'</span><span class="sub">'+fd(x.due)+'</span></div>').join('')||no)+'</section>';
+return h};
+const lst=(k,ti,f,row)=>()=>'<form class="card" id="f_'+k+'"><h2>'+ti+'</h2><div class="form">'+f+'</div><button class="btn" type="submit">जोडा</button></form>'+(S[k].length?'<section class="card">'+S[k].map(row).join('')+'</section>':none('काहीही नाही.'));
+const del=(k,id)=>'<button class="btn dn xs" data-act="dl" data-k="'+k+'" data-id="'+id+'">काढा</button>';
+P.tt=lst('tt','वेळापत्रकात तास जोडा','<div><label class="lbl" for="x1">वार</label><select id="x1">'+opts(DAYS)+'</select></div><div><label class="lbl" for="x2">वेळ</label><input id="x2" type="time" value="07:00"></div><div><label class="lbl" for="x3">विषय</label><input id="x3" required></div><div><label class="lbl" for="x4">वर्ग</label><select id="x4">'+opts(bat())+'</select></div>',x=>'<div class="item"><span><strong>'+esc(x.day)+' '+esc(x.time)+'</strong> '+esc(x.subject)+' <span class="chip">'+esc(x.batch)+'</span></span>'+del('tt',x.id)+'</div>');
+P.not=lst('notices','नवीन सूचना','<div class="wide"><label class="lbl" for="x1">सूचना</label><textarea id="x1" rows="3" required></textarea></div>',x=>'<div class="item"><span><span class="pre">'+esc(x.text)+'</span><br><span class="sub">'+fd(x.date)+'</span></span>'+del('notices',x.id)+'</div>');
+P.hw=lst('hw','नवीन गृहपाठ','<div><label class="lbl" for="x1">वर्ग</label><select id="x1">'+opts(bat())+'</select></div><div><label class="lbl" for="x2">विषय</label><input id="x2" required></div><div class="wide"><label class="lbl" for="x3">गृहपाठ</label><textarea id="x3" rows="2" required></textarea></div><div><label class="lbl" for="x4">अंतिम तारीख</label><input id="x4" type="date" value="'+today()+'"></div>',x=>'<div class="item"><span class="'+(x.done?'done':'')+'"><strong>'+esc(x.subject)+'</strong> <span class="chip">'+esc(x.batch)+'</span><br>'+esc(x.text)+'<br><span class="sub">'+fd(x.due)+'</span></span><span class="row"><button class="btn xs ghost" data-act="hd" data-id="'+x.id+'">'+(x.done?'परत चालू':'पूर्ण')+'</button>'+del('hw',x.id)+'</span></div>');
+P.set=()=>ban()+'<section class="card"><h2>सेटिंग्ज</h2><button class="btn" data-act="dlall">सर्व डेटा डाउनलोड करा (फोटो)</button><button class="btn ghost" data-act="dlatt">हजेरी डाउनलोड (फोटो)</button><button class="btn ghost" data-act="dlfee">फी डाउनलोड (फोटो)</button><button class="btn ghost" data-act="dlmk">टेस्ट गुण डाउनलोड (फोटो)</button><button class="btn dn" data-act="rst">सर्व डेटा पुसा</button></section>';
+function render(){hdr();tabs();$('#panel').innerHTML=P[ui.tab]()}
+function empty(){S=norm({students:[],name:S.name,tag:S.tag,theme:S.theme});S.sample=false}
+function go(t){ui.tab=t;render();window.scrollTo(0,0)}
+const find=(a,id)=>a.find(x=>x.id===id);
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)return go(g.dataset.go);const tb=e.target.closest('[data-tab]');if(tb)return go(tb.dataset.tab);const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id;
+if(a==='dlall')dlPng(null,null,'sarva_mahiti');else if(a==='dlatt')dlPng(['२'],null,'hajeri');else if(a==='dlatb')dlPng(['२'],ui.batch||null,'hajeri'+(ui.batch?'_'+ui.batch.replace(/\s/g,''):''));else if(a==='dlfee')dlPng(['३'],null,'fee');else if(a==='dlmk')dlPng(['४'],null,'test_gun');else if(a==='dlrc')dlPng(['२'],ui.rc,'hajeri_'+ui.rc.replace(/\s/g,''));else if(a==='dlreg')dlReg();else if(a==='dlattcsv')dlAttCsv();
+else if(a==='en'){ui.edit=true;hdr();$('#ni').focus()}else if(a==='cn'){ui.edit=false;hdr()}
+else if(a==='th'){const r=document.documentElement,d=r.dataset.theme==='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark';S.theme=r.dataset.theme;save()}
+else if(a==='clr'){if(confirm('उदाहरण डेटा काढायचा?')){empty();save();render()}}
+else if(a==='rst'){if(confirm('सर्व डेटा कायमचा पुसायचा?')){empty();save();render()}}
+else if(a==='pre'){const s=find(S.students,id),ta=document.querySelector('.cmp[data-id="'+id+'"]');ta.value=ta.value.replace(/\s*$/,'')+' '+PRE[+b.dataset.i]+'.';dr[id]=ta.value;$('#w'+id).href=wa(s.phone,ta.value)}
+else if(a==='ds'){if(confirm('हा विद्यार्थी काढायचा?')){S.students=S.students.filter(s=>s.id!==id);save();render()}}
+else if(a==='mk'){const d=S.att[ui.date]=S.att[ui.date]||{};d[id]=d[id]===b.dataset.v?undefined:b.dataset.v;if(!d[id])delete d[id];save();render()}
+else if(a==='allp'){const d=S.att[ui.date]=S.att[ui.date]||{};filt().forEach(s=>d[s.id]='P');save();render();toast('सर्व उपस्थित केले')}
+else if(a==='rc'){ui.rc=b.dataset.v;render()}
+else if(a==='tg'){ui.open=ui.open||{};ui.open[id]=!ui.open[id];render()}
+else if(a==='ta'){ui.oa=ui.oa||{};ui.oa[id]=!ui.oa[id];render()}
+else if(a==='oaA'||a==='oaH'){ui.oa=ui.oa||{};S.students.forEach(s=>ui.oa[s.id]=a==='oaA');render()}
+else if(a==='showall'||a==='hideall'){ui.open=ui.open||{};S.students.filter(s=>s.batch===ui.rc).forEach(s=>ui.open[s.id]=a==='showall');render()}
+else if(a==='pay'){const i=$('#pa'+id),v=Number(i.value);if(v>0){find(S.students,id).pay.push({amt:v,date:today()});save();render();toast('फी नोंदवली')}}
+else if(a==='st'){ui.test=id;render()}
+else if(a==='dt'){if(confirm('टेस्ट काढायची?')){S.tests=S.tests.filter(t=>t.id!==ui.test);ui.test=null;save();render()}}
+else if(a==='dl'){const k=b.dataset.k;S[k]=S[k].filter(x=>x.id!==id);save();render()}
+else if(a==='hd'){const h=find(S.hw,id);h.done=!h.done;save();render()}});
+document.addEventListener('submit',e=>{e.preventDefault();const f=e.target.id,v=i=>($('#'+i)||{}).value;
+if(f==='nf'){S.name=v('ni').trim()||S.name;S.tag=v('ti').trim();ui.edit=false;save();render()}
+else if(f==='af'){S.students.push({id:uid(),name:v('an').trim(),phone:v('ap').trim(),batch:v('ab'),fee:Number(v('af2'))||0,pay:[]});save();render();toast('विद्यार्थी जोडला')}
+else if(f==='tf'){const t={id:uid(),title:v('tn').trim(),max:Number(v('tm'))||50,date:today(),scores:{}};S.tests.push(t);ui.test=t.id;save();render()}
+else if(f==='f_tt')S.tt.push({id:uid(),day:v('x1'),time:v('x2'),subject:v('x3').trim(),batch:v('x4')});
+else if(f==='f_notices')S.notices.push({id:uid(),text:v('x1').trim(),date:today()});
+else if(f==='f_hw')S.hw.push({id:uid(),batch:v('x1'),subject:v('x2').trim(),text:v('x3').trim(),due:v('x4'),done:false});
+if(f&&f.indexOf('f_')===0){save();render()}});
+document.addEventListener('input',e=>{const t=e.target;
+if(t.id==='q'){ui.q=t.value;const p=t.selectionStart;render();const n=$('#q');n.focus();n.setSelectionRange(p,p)}
+else if(t.classList.contains('cmp')){dr[t.dataset.id]=t.value;const s=find(S.students,t.dataset.id);$('#w'+t.dataset.id).href=wa(s.phone,t.value)}
+else if(t.classList.contains('sc2')){const x=find(S.tests,ui.test);if(t.value==='')delete x.scores[t.dataset.id];else x.scores[t.dataset.id]=Number(t.value);save()}});
+document.addEventListener('change',e=>{const t=e.target;if(t.id==='bs'){ui.batch=t.value;render()}else if(t.id==='ad'){ui.date=t.value||today();render()}else if(t.id==='rm'){ui.rm=t.value||ui.rm;render()}});
+if(S.theme)document.documentElement.dataset.theme=S.theme;
+render();
+})();
+</script>
+</body>
+</html>
